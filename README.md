@@ -8,12 +8,11 @@ Alan Kruppa
 An explanation of my ASAPP challenge project code to date
 ------------------------------------------------------------------------------
 
------ Scripts (and files) included -----
+----- Scripts included -----
 
 challenge_data_reader.py (explanation below)
+
 challenge_data_model.py (explanation below)
-README.txt (this file)
-sample_conversations.json (data)
 
 The first, 'reader', opens the 'sample_conversations.json' file, imports 
 it as a Python object, and grabs the customer service representative's
@@ -34,7 +33,9 @@ and the second is an example use of the autosuggestion function called get_match
 ---- Example commands and outputs -----
 
 >>> execfile('challenge_data_model.py')
+
 >>> get_matching_csrep_messages('can')
+
 [u'can', u'can help', u'can help you', u'can help you with', u'can assist', u'can assist you', u'can assist you with', u'can help you with today', u'can assist you with ?', u'can help you with ?']
 
 ******************************************************************************
