@@ -1,29 +1,29 @@
-#-----------------------------------------------------------------------------
-### description
-### alan kruppa
-### challenge_data_reader.py
-### 5/21/2015
-### first attempt at the data model for the challenge project after
-### manually looking at its structure
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# description
+# alan kruppa
+# challenge_data_reader.py
+# 5/21/2015
+# first attempt at the data model for the challenge project after
+# manually looking at its structure
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-## structure of challenge project data
-## dict
-## -'NumTextMessages'
-##  -int (22264)
-## -'Issues'         
-##  -list of dict (1508)
-##   -'Messages'
-##    -list of dict
-##     -'Text'
-##     -'IsFromCustomer'
-##    -list of 
-##   -'IssueId'
-##    -int
-##   -'CompanyGroupId'
-##    -int
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# structure of challenge project data
+# dict
+# -'NumTextMessages'
+#  -int (22264)
+# -'Issues'         
+#  -list of dict (1508)
+#   -'Messages'
+#    -list of dict
+#     -'Text'
+#     -'IsFromCustomer'
+#    -list of 
+#   -'IssueId'
+#    -int
+#   -'CompanyGroupId'
+#    -int
+# -----------------------------------------------------------------------------
 
 import json
 
@@ -33,6 +33,7 @@ def make_json_obj(filename):
     text = f.read()
     obj = json.loads(text)
     return obj
+
 
 # grab the customer service rep messages from the json obj, assuming i know 
 # where to find them
@@ -46,8 +47,7 @@ def grab_csrep_messages(obj):
                 count = count + 1
                 csrepMsgList = csrepMsgList + x1['Text']
     return csrepMsgList
-    
+
 # from __future__ import division
 # import nltk, re, pprint
 # from nltk import word_tokenize
-
