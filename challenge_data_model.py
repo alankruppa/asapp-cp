@@ -1,9 +1,7 @@
 # -----------------------------------------------------------------------------
 # description
-# alan kruppa
-# challenge_data_model.py
-# 5/21/2015
-# a very basic working version of commands to generate a tokenized word
+#
+#  a very basic working version of commands to generate a tokenized word
 # list and associated nltk text class for further nlp resulting in a 
 # sorted list of the most frequently occurring phrases found in the cs 
 # rep's messages
@@ -17,17 +15,12 @@
 from __future__ import division
 import nltk
 import re
-import challenge_data_reader as cdr
 import json
-
-conversations_text = cdr.make_json_obj('sample_conversations.json')
-csrep_message_list = cdr.grab_csrep_messages(conversations_text)
-corpus1 = nltk.word_tokenize(csrep_message_list)
-L = len(corpus1)
 
 def make_json_obj(filename):
     f = file(filename)
     text = f.read()
+    del f
     obj = json.loads(text)
     return obj
 
@@ -42,29 +35,30 @@ def grab_csrep_messages(obj):
                 csrep_messages = csrep_messages + x1['Text']
     return csrep_messages
 
-def fdist_phrases(words_list, phrase_length, delimiter):
+def fdist_phrases(words_list, phrase_length, occurrences, delimiter):
     L = len(words_list)
     phrases = words_list[0:L-phrase_length+1]
-    for x1 in range(L-phrase_length+1):
-        for x2 in range(phrase_length)[1:phrase_length]:
-            phrases[x1] = phrases[x1] + delimiter + words_list[x1+x2]
+    for x0 in range(L-phrase_length+1):
+        for x1 in range(phrase_length)[1:phrase_length]:
+            phrases[x0] = phrases[x0] + delimiter + words_list[x0+x1]
     if type(words_list) == list:
         fdist = nltk.FreqDist(nltk.Text(phrases))
     elif type(words_list) == nltk.text.Text:
         fdist = nltk.FreqDist(nltk.Text(phrases))
-    common_occurrences = fdist.most_common()
+    common_occurrences = fdist.most_common(occurrences)
     master_list = []
     for x in range(len(common_occurrences)):
-        if common_occurrences[x][1] <= minOccurrenceThr:
+        if common_occurrences[x][1] <= occurrences:
             break
-        master_list.append(common_occurrences[x][0].replace('_', ' '),
+        master_list.append(common_occurrences[x][0].replace(delimiter, ' '),
                            common_occurrences[x][1])
     master_list = sorted(master_list, key=lambda byColumn: byColumn[0])
-    master_list_2 = []
+    master_list_letters_only = []
     for x in range(len(master_list)):
         if re.search('[a-zA-Z]', master_list[x][0][0]):
-            master_list_2.append(master_list[x])
-    master_set = set(master_list_2)
+            master_list_letters_only.append(master_list[x])
+    master_set = set(master_list_letters_only)
+    return master_set
 
 def get_autosuggestions(string,num_matches):
     autosuggestions = []
@@ -77,3 +71,7 @@ def get_autosuggestions(string,num_matches):
             break
         autosuggestions.append(matches[x][0])
     return autosuggestions
+
+conversations_text = make_json_obj('sample_conversations.json')
+csrep_message_list = grab_csrep_messages(conversations_text)
+corpus1 = nltk.word_tokenize(csrep_message_list)
