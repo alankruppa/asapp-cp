@@ -16,6 +16,7 @@ from __future__ import division
 import nltk
 import re
 import json
+import timeit
 
 def make_json_obj(filename):
     f = file(filename)
@@ -35,34 +36,33 @@ def grab_csrep_messages(obj):
                 csrep_messages = csrep_messages + x1['Text']
     return csrep_messages
 
-def fdist_phrases(words_list, phrase_length, occurrences, delimiter):
-    L = len(words_list)
-    phrases = words_list[0:L-phrase_length+1]
+def fdist_phrases(corpus, phrase_length, occurrences, delimiter,
+                  master_list):
+    L = len(corpus)
+    phrases = corpus[0:L-phrase_length+1]
     for x0 in range(L-phrase_length+1):
         for x1 in range(phrase_length)[1:phrase_length]:
-            phrases[x0] = phrases[x0] + delimiter + words_list[x0+x1]
-    if type(words_list) == list:
+            phrases[x0] = phrases[x0] + delimiter + corpus[x0+x1]
+    if type(corpus) == list:
         fdist = nltk.FreqDist(nltk.Text(phrases))
-    elif type(words_list) == nltk.text.Text:
+    elif type(corpus) == nltk.text.Text:
         fdist = nltk.FreqDist(nltk.Text(phrases))
-    common_occurrences = fdist.most_common(occurrences)
-    master_list = []
+    common_occurrences = fdist.most_common()
     for x in range(len(common_occurrences)):
         if common_occurrences[x][1] <= occurrences:
             break
-        master_list.append(common_occurrences[x][0].replace(delimiter, ' '),
-                           common_occurrences[x][1])
+        master_list.append((common_occurrences[x][0].replace(delimiter, ' '),
+                           common_occurrences[x][1]))
     master_list = sorted(master_list, key=lambda byColumn: byColumn[0])
     master_list_letters_only = []
     for x in range(len(master_list)):
         if re.search('[a-zA-Z]', master_list[x][0][0]):
             master_list_letters_only.append(master_list[x])
-    master_set = set(master_list_letters_only)
-    return master_set
+    return master_list_letters_only
 
-def get_autosuggestions(string,num_matches):
+def get_autosuggestions(string, num_matches, search_set):
     autosuggestions = []
-    matches = [x for x in master_set if re.search(string, x[0][0:len(string)])]
+    matches = [x for x in search_set if re.search(string, x[0][0:len(string)])]
     matches = sorted(matches, key=lambda byColumn: byColumn[1], reverse=True)
     L = len(matches)
     matches = matches[0:num_matches]
@@ -74,4 +74,11 @@ def get_autosuggestions(string,num_matches):
 
 conversations_text = make_json_obj('sample_conversations.json')
 csrep_message_list = grab_csrep_messages(conversations_text)
-corpus1 = nltk.word_tokenize(csrep_message_list)
+corpus = nltk.word_tokenize(csrep_message_list)
+autosuggestion_list = []
+for x in range(5):
+    autosuggestion_list = fdist_phrases(corpus, x+1, 3, '_', autosuggestion_list)
+autosuggestion_list = set(autosuggestion_list)
+
+if __name__ == '__main__':
+    main()
