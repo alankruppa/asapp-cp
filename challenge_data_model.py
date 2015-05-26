@@ -54,13 +54,20 @@ def fdist_phrases(corpus, phrase_length, occurrences, delimiter,
             replace(delimiter, ' ')
         common_occurrence_append = common_occurrence_append.\
             replace(' ,', ',')
+        common_occurrence_append = common_occurrence_append.\
+            replace(' .', '.')
+        common_occurrence_append = common_occurrence_append.\
+            replace(' !', '!')
+        common_occurrence_append = common_occurrence_append.\
+            replace(' ?', '?')
         master_list.append((common_occurrence_append, common_occurrences[x][1]))
     master_list = sorted(master_list, key=lambda byColumn: byColumn[0])
     master_list_letters_only = []
     for x in range(len(master_list)):
+        interior = len(master_list[x][0])-1
         if re.search('[a-zA-Z]', master_list[x][0][0]) and\
-                not re.search('\.', master_list[x][0]) and\
-                not re.search('!', master_list[x][0]):
+                not re.search('\.', master_list[x][0][0:interior]) and\
+                not re.search('!', master_list[x][0][0:interior]):
             master_list_letters_only.append(master_list[x])
     return master_list_letters_only
 
