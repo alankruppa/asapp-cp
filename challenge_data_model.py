@@ -10,6 +10,22 @@
 # advantage of the nltk FreqDist function for sorting occurrences of
 # phrases in addition to single words. the delimiter in between the
 # concatenated words will be removed when the master list is created
+#
+# structure of challenge project data
+# dict
+# -'NumTextMessages'
+#  -int (22264)
+# -'Issues'
+#  -list of dict (1508)
+#   -'Messages'
+#    -list of dict
+#     -'Text'
+#     -'IsFromCustomer'
+#    -list of
+#   -'IssueId'
+#    -int
+#   -'CompanyGroupId'
+#    -int
 # -----------------------------------------------------------------------------
 
 from __future__ import division
@@ -45,31 +61,31 @@ def fdist_phrases(corpus, phrase_length, occurrences, delimiter,
     if type(corpus) == list:
         fdist = nltk.FreqDist(nltk.Text(phrases))
     elif type(corpus) == nltk.text.Text:
-        fdist = nltk.FreqDist(nltk.Text(phrases))
+        fdist = nltk.FreqDist(phrases)
     common_occurrences = fdist.most_common()
     for x in range(len(common_occurrences)):
         if common_occurrences[x][1] <= occurrences:
             break
-        common_occurrence_append = common_occurrences[x][0].\
+            # note: how to account for preference of 'Are you available
+            # tomorrow?' over 'Are you available tomorrow'. how best to
+            # take into account the preference for the question mark
+        common_occurrence_corrected = common_occurrences[x][0].\
             replace(delimiter, ' ')
-        common_occurrence_append = common_occurrence_append.\
-            replace(' ,', ',')
-        common_occurrence_append = common_occurrence_append.\
-            replace(' .', '.')
-        common_occurrence_append = common_occurrence_append.\
-            replace(' !', '!')
-        common_occurrence_append = common_occurrence_append.\
-            replace(' ?', '?')
-        master_list.append((common_occurrence_append, common_occurrences[x][1]))
+        for x1 in '!?,\'".':
+            common_occurrence_corrected = common_occurrence_corrected.\
+                replace(' '+x1, x1)
+        master_list.append((common_occurrence_corrected, common_occurrences[x][1]))
     master_list = sorted(master_list, key=lambda byColumn: byColumn[0])
     master_list_letters_only = []
     for x in range(len(master_list)):
         interior = len(master_list[x][0])-1
         if re.search('[a-zA-Z]', master_list[x][0][0]) and\
-                not re.search('\.', master_list[x][0][0:interior]) and\
-                not re.search('!', master_list[x][0][0:interior]):
+                not re.search('\.!', master_list[x][0][0:interior]):
             master_list_letters_only.append(master_list[x])
     return master_list_letters_only
+
+# need function for generating exceptions when something unexpected (e.g. a
+# bracket) is in the message, for manual oversight
 
 def get_autosuggestions(string, num_matches, search_set):
     matches = [x for x in search_set if re.search(string, x[0][0:len(string)])]
@@ -83,7 +99,7 @@ def get_autosuggestions(string, num_matches, search_set):
         autosuggestions.append(matches[x][0])
     return autosuggestions
 
-# correct puncuation in list. can remove anything with a sentence transition
+# correct punctuation in list. can remove anything with a sentence transition
 
 conversations_text = make_json_obj('sample_conversations.json')
 csrep_message_list = grab_csrep_messages(conversations_text)
