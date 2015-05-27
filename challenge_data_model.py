@@ -108,6 +108,6 @@ autosuggestion_list = []
 for x in range(5):
     autosuggestion_list = fdist_phrases(corpus, x+1, 3, '_', autosuggestion_list)
 autosuggestion_set = set(autosuggestion_list)
-
+autosuggestion_dict = dict(autosuggestion_list)
 # if __name__ == '__main__':
 #    main()
